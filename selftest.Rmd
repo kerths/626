@@ -1,0 +1,65 @@
+---
+title: "Untitled"
+author: "junxian liu"
+date: "2023-04-16"
+output: html_document
+---
+
+```{r}
+path <- "C:/Users/jul17033/Desktop/training_data.txt"
+data <- readLines(path)
+header <- unlist(strsplit(data[1], "\\s+"))
+data <- data[-1]
+data <- read.table(text = data, header = FALSE, sep = "\t")
+colnames(data) <- header
+```
+
+```{r}
+library(caret)
+library(randomForest)
+
+set.seed(123)
+train_index <- sample(nrow(data), nrow(data) * 0.75)
+train_data <- data[train_index, ]
+test_data <- data[-train_index, ]
+
+train_data$activity <- ifelse(train_data$activity >= 7, 7, train_data$activity)
+train_data$activity <- factor(train_data$activity, levels = 1:7)
+
+```
+
+```{r}
+model <- randomForest(activity ~ ., train_data[, 2:562])
+pred <- predict(model, test_data)
+datapred <- data.frame(test_data$activity, pred)
+colnames(datapred) <- c("True", "Pred")
+
+accuracy <- mean(datapred$True == datapred$Pred)
+cat("Accuracy: ", round(accuracy, 4))
+
+```
+```{r}
+library(MASS)
+lda_model <- lda(activity ~ ., train_data[, 2:562])
+
+pred <- predict(lda_model, test_data)
+
+datapred <- data.frame(test_data$activity, pred)
+colnames(datapred) <- c("True", "Pred")
+
+accuracy <- mean(datapred$True == datapred$Pred)
+cat("Accuracy: ", round(accuracy, 4))
+```
+```{r}
+library(e1071)
+svmmodel<- svm(train_data[, c(3:563)], train_data$activity, type = "C-classification", kernel = "linear")
+pred <- predict(svmmodel, test_data[, c(3:563)])
+
+datapred <- data.frame(test_data$activity, pred)
+colnames(datapred) <- c("True", "Pred")
+
+accuracy <- mean(datapred$True == datapred$Pred)
+cat("Accuracy: ", round(accuracy, 4))
+```
+
+
