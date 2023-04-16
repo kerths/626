@@ -1,0 +1,45 @@
+---
+title: "Untitled"
+author: "junxian liu"
+date: "2023-04-11"
+output: html_document
+---
+
+```{r}
+setwd("C:/Users/jul17033/Desktop")
+file_path <- "C:/Users/jul17033/Desktop/training_data.txt"
+data <- readLines(file_path)
+header <- unlist(strsplit(data[1], "\\s+"))
+data <- data[-1]
+data <- read.table(text = data, header = FALSE, sep = "\t")
+colnames(data) <- header
+file_path <- "C:/Users/jul17033/Desktop/test_data.txt"
+test <- readLines(file_path)
+header <- unlist(strsplit(test[1], "\\s+"))
+test <- test[-1]
+test <- read.table(text = test, header = FALSE, sep = "\t")
+colnames(test) <- header
+```
+
+```{r}
+data$activity_type <- ifelse(data$activity %in% c(1,2,3), 1, 0)
+model <- glm(activity_type ~ ., data = data[, -2], family = "binomial")
+```
+
+```{r}
+test$predicted_activity <- predict(model, newdata = test, type = "response")
+test$predicted_activity <- ifelse(test$predicted_activity > 0.5, 1, 0)
+test$predicted_activity
+```
+
+```{r}
+write.table(test$predicted_activity, "binary_mzlmaI.txt", col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
+```{r}
+data$activity <- ifelse(data$activity >= 7, 7, data$activity)
+data$activity <- factor(data$activity, levels = 1:7)
+library(randomForest)
+
+```
+

@@ -1,0 +1,43 @@
+---
+title: "Untitled"
+author: "junxian liu"
+date: "2023-04-11"
+output: html_document
+---
+
+```{r}
+#import and read the data set
+setwd("C:/Users/jul17033/Desktop")
+path <- "C:/Users/jul17033/Desktop/training_data.txt"
+data <- readLines(path)
+header <- unlist(strsplit(data[1], "\\s+"))
+data <- data[-1]
+data <- read.table(text = data, header = FALSE, sep = "\t")
+colnames(data) <- header
+path <- "C:/Users/jul17033/Desktop/test_data.txt"
+test <- readLines(path)
+header <- unlist(strsplit(test[1], "\\s+"))
+test <- test[-1]
+test <- read.table(text = test, header = FALSE, sep = "\t")
+colnames(test) <- header
+```
+
+
+```{r}
+#Grouping of activity and modelling by random forest
+data$activity <- ifelse(data$activity >= 7, 7, data$activity)
+data$activity <- factor(data$activity, levels = 1:7)
+library(randomForest)
+model <- randomForest(activity ~ ., data[, c(2:563)])
+
+```
+
+```{r}
+#make prediction
+test$predicted_activity <- predict(model, test)
+```
+
+```{r}
+write.table(test$predicted_activity, "multiclass_mzlmaI.txt", col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+

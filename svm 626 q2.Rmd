@@ -1,0 +1,36 @@
+```{r}
+#import and read the data set
+setwd("C:/Users/jul17033/Desktop")
+path <- "C:/Users/jul17033/Desktop/training_data.txt"
+data <- readLines(path)
+header <- unlist(strsplit(data[1], "\\s+"))
+data <- data[-1]
+data <- read.table(text = data, header = FALSE, sep = "\t")
+colnames(data) <- header
+path <- "C:/Users/jul17033/Desktop/test_data.txt"
+test <- readLines(path)
+header <- unlist(strsplit(test[1], "\\s+"))
+test <- test[-1]
+test <- read.table(text = test, header = FALSE, sep = "\t")
+colnames(test) <- header
+```
+
+```{r}
+#Grouping of activity and modeling by SVM
+data$activity <- ifelse(data$activity >= 7, 7, data$activity)
+data$activity <- factor(data$activity, levels = 1:7)
+library(e1071)
+model<- svm(data[, c(3:563)], data$activity, type = "C-classification", kernel = "linear")
+```
+
+```{r}
+#make prediction
+test$predicted_activity <- predict(model,test[, c(2:562)])
+test$predicted_activity
+write.table(test$predicted_activity, "multiclass_3mzlmal.txt", col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
+```{r}
+
+```
+
